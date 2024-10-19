@@ -113,7 +113,12 @@
           <Table v-if="!isLoading" :headers="['ID', 'Firstname', 'Middlename', 'Lastname']"  :data="teachers"
             @row-selected="handleRowClick" />
         </div>
-      </div>
+        <!-- <div class="mx-auto w-max" >
+          <button :disabled="isLoading" class="px-4 py-2 text-black rounded border border-grey border-2"
+          :class="{ 'opacity-50 cursor-not-allowed': isLoading }">1</button>
+        </div> -->
+        <Pagination/>
+        </div>
     </div>
   </div>
 </template>
@@ -122,13 +127,15 @@
 import Table from '@/components/UI/Table.vue';
 import Modal from '@/components/UI/Modal.vue';
 import Spinner from '@/components/UI/Spinner.vue';
+import Pagination from '@/components/UI/Pagination.vue';
 import axios from 'axios'
 
 export default {
   components: {
     Table,
     Modal,
-    Spinner
+    Spinner,
+    Pagination
   },
   data() {
     return {
@@ -218,7 +225,9 @@ export default {
           search: this.searchTerm
         }
       }).then(response => {
-        this.teachers = response.data.data;
+        console.log(response)
+
+        this.teachers = response.data.teachers;
       }).catch(error => console.error(error)).finally(() => {
         this.isLoading = false;
       });

@@ -10,6 +10,10 @@ import Schedule from '@/views/schedule/List.vue';
 import RoomSchedule from '@/views/roomSchedule/List.vue';
 import Teacher from '@/views/teacher/List.vue';
 import Department from '@/views/department/List.vue';
+import Course from '@/views/course/List.vue';
+import Subject from '@/views/subject/List.vue';
+import Section from '@/views/section/List.vue';
+
 
 
 const routes = [
@@ -24,6 +28,9 @@ const routes = [
       { path: '/room/show/:id', component: ShowRoom },
       { path: '/schedule', component: Schedule },
       { path: '/room-schedule', component: RoomSchedule },
+      { path: '/course', component: Course },
+      { path: '/subject', component: Subject },
+      { path: '/class-section', component: Section },
       // Add more routes as needed
     ],
   },

@@ -10,8 +10,11 @@
     <!-- Table body -->
     <tbody>
       <tr class="hover:bg-gray-200 cursor-pointer" v-for="row in data" :key="row.id" @click="handleRowClick(row)">
-        <td :class="{ 'font-bold text-red-700 bg-red-200': hasNullValue(row) }"
-          class="py-2 px-4 border-b text-center border" v-for="key in keys" :key="key">{{ row[key] }}</td>
+        <td v-for="key in keys" :key="key" v-show="showData(key)"
+          :class="{ 'font-bold text-red-700 bg-red-200': hasNullValue(row) }"
+          class="py-2 px-4 border-b text-center border">
+          {{ row[key] }}
+        </td>
       </tr>
     </tbody>
     <!-- Table footer -->
@@ -22,7 +25,7 @@
           colspan="4">
           <i class="fa-solid fa-circle-info"></i> Rows with empty data will not be saved.
         </td>
-        <td v-if="data.length == 0" :colspan="headers.length" class="font-bold text-center border text-lg"
+        <td v-if="data?.length == 0" :colspan="headers?.length" class="font-bold text-center border text-lg"
           colspan="4">
           <i class="fa-regular fa-face-sad-cry"></i> No data is currently available.
         </td>
@@ -54,12 +57,16 @@ export default {
     },
     // Check if null values are present in the row
     hasNullValue(value) {
-      var hasNull = Object.values(value).includes(null); // Check if object includes null value
+      const hasNull = Object.values(value).includes(null); // Check if object includes null value
       if (hasNull === true) {
         this.nullDetected = true; // Set nullDetected flag to true if null values are detected
       }
       return hasNull; // Return whether null values are detected
     },
+    showData(value) {
+      const hiddenKeys = ['id', 'created_at', 'updated_at','departmentId'];
+      return !hiddenKeys.includes(value);
+    }
   }
 };
 </script>

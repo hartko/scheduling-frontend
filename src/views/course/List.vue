@@ -2,55 +2,32 @@
   <div class="items-center">
     <div class="border-blue-300 p-5 rounded">
       <div class="flex items-center">
-        <Modal :is-open="scheduleModalOpen" @close="closeModal" title="Schedule Details"
+        <Modal :is-open="courseModalOpen" @close="closeModal" title="Course Details"
           modalClass='bg-gray-700 rounded-lg shadow-lg p-8 text-white max-w-3xl w-full'>
           <div class="grid grid-cols-12 gap-3 mt-10">
-            <!-- Left column for schedule name and capacity -->
+            <!-- Left column for course name and capacity -->
             <div class="col-span-2">
-              <label for="scheduleName" class="text-lg font-semibold mb-1">Schedule ID: </label>
+              <label for="courseName" class="text-lg font-semibold mb-1">Course ID: </label>
             </div>
             <div class="col-span-10">
-              <input type="text" id="scheduleName" v-model="selectedSchedule.scheduleId" :disabled="viewSchedule"
+              <input type="text" id="courseName" v-model="selectedCourse.courseId" :disabled="viewCourse"
                 class="w-full ml-2 px-2 py-1 bg-gray-600 border border-gray-500 rounded-md focus:outline-none focus:border-gray-500">
             </div>
             <div class="col-span-2">
-              <label for="scheduleName" class="text-lg font-semibold mb-1">Name: </label>
+              <label for="courseName" class="text-lg font-semibold mb-1">Name: </label>
             </div>
             <div class="col-span-10">
-              <input type="text" id="scheduleName" v-model="selectedSchedule.name" :disabled="viewSchedule"
-                class="w-full ml-2 px-2 py-1 bg-gray-600 border border-gray-500 rounded-md focus:outline-none focus:border-gray-500">
-            </div>
-            <div class="col-span-2">
-              <label for="scheduleName" class="text-lg font-semibold mb-1">Capacity: </label>
-            </div>
-            <div class="col-span-10">
-              <input type="text" id="scheduleName" v-model="selectedSchedule.capacity" :disabled="viewSchedule"
-                class="w-full ml-2 px-2 py-1 bg-gray-600 border border-gray-500 rounded-md focus:outline-none focus:border-gray-500">
-            </div>
-            <div class="col-span-2">
-              <label for="scheduleName" class="text-lg font-semibold mb-1">Floor: </label>
-            </div>
-            <div class="col-span-10">
-              <input type="text" id="scheduleName" v-model="selectedSchedule.floor" :disabled="viewSchedule"
-                class="w-full ml-2 px-2 py-1 bg-gray-600 border border-gray-500 rounded-md focus:outline-none focus:border-gray-500">
-            </div>
-            <div class="col-span-2">
-              <label for="scheduleName" class="text-lg font-semibold mb-1">Building: </label>
-            </div>
-            <div class="col-span-10">
-              <input type="text" id="scheduleName" v-model="selectedSchedule.capacity" :disabled="viewSchedule"
+              <input type="text" id="courseName" v-model="selectedCourse.name" :disabled="viewCourse"
                 class="w-full ml-2 px-2 py-1 bg-gray-600 border border-gray-500 rounded-md focus:outline-none focus:border-gray-500">
             </div>
           </div>
           <div class="pt-10 flex justify-end space-x-1">
-            <button @click="viewSchedule = false" :disabled="isLoading" class="px-4 py-2 bg-gray-500 text-white rounded"
+            <button @click="viewCourse = false" :disabled="isLoading" class="px-4 py-2 bg-gray-500 text-white rounded"
               :class="{ 'opacity-50 cursor-not-allowed': isLoading }"><i
                 class="fa-regular fa-pen-to-square"></i></button>
-            <button v-if="!viewSchedule" @click="updateSchedule" :disabled="isLoading"
-              class="px-4 py-2 bg-green-500 text-white rounded"
+            <button v-if="!viewCourse" @click="updateCourse" :disabled="isLoading" class="px-4 py-2 bg-green-500 text-white rounded"
               :class="{ 'opacity-50 cursor-not-allowed': isLoading }"><i class="fa-regular fa-floppy-disk"></i></button>
-            <button v-if="!viewSchedule" @click="viewSchedule = true" :disabled="isLoading"
-              class="px-4 py-2 bg-blue-500 text-white rounded"
+              <button v-if="!viewCourse" @click="viewCourse = true" :disabled="isLoading" class="px-4 py-2 bg-blue-500 text-white rounded"
               :class="{ 'opacity-50 cursor-not-allowed': isLoading }"><i class="fa-regular fa-eye"></i></button>
           </div>
         </Modal>
@@ -75,10 +52,10 @@
               <Spinner :color="'#4299e1'" :size="100" />
             </div>
             <!-- Display uploaded data -->
-            <div v-else-if="uploadedSchedules.length > 0">
+            <div v-else-if="uploadedCourses.length > 0">
               <p class="text-xl mt-8">Please verify if the data is correct.</p>
               <div class="overflow-auto max-w-full max-h-96">
-                <Table class="bg-white text-black table-fixed" :headers="uploadedHeader" :data="uploadedSchedules"
+                <Table class="bg-white text-black table-fixed" :headers="uploadedHeader" :data="uploadedCourses"
                   @row-selected="handleRowClick" />
               </div>
               <!-- Button to save data -->
@@ -93,10 +70,21 @@
       <!-- Search and action elements -->
       <div class="py-8 px-8 m-8 border rounded-md border-solid border-gray-300">
         <div class="mb-4 flex items-center">
+          <div class="mr-auto space-x-1 flex items-center">
+            <!-- Input field for search term -->
+            <input type="text" v-model="searchTerm" placeholder="Search..."
+              class="px-3 py-2 border border-gray-300 rounded-l" />
+            <!-- Button to search -->
+            <button @click="getCourses" :disabled="isLoading" class="px-4 py-2 bg-blue-500 text-white rounded"
+              :class="{ 'opacity-50 cursor-not-allowed': isLoading }"><i
+                class="fa-sharp fa-solid fa-magnifying-glass"></i></button>
+            <!-- Button to clear search -->
+            <button @click="clear" :disabled="isLoading" class="px-4 py-2 bg-gray-500 text-white rounded"
+              :class="{ 'opacity-50 cursor-not-allowed': isLoading }"><i class="fa-regular fa-trash-can"></i></button>
+          </div>
           <div class="ml-auto space-x-1">
             <!-- Button to add -->
-            <button @click="createScheduleModal" class="px-4 py-2 bg-green-500 text-white rounded"><i
-                class="fa-solid fa-plus"></i></button>
+            <button @click="createCourseModal" class="px-4 py-2 bg-green-500 text-white rounded"><i class="fa-solid fa-plus"></i></button>
             <!-- Button to open modal -->
             <button @click="openModal" class="px-4 py-2 bg-gray-500 text-white rounded"><i
                 class="fa-solid fa-upload"></i></button>
@@ -104,13 +92,12 @@
         </div>
         <!-- Table component -->
         <div class="rounded overflow-hidden border border-gray-300">
-          <!-- Spinner while loading -->
-          <Tab :tabs="tabs">
-            <template v-slot:default="{ tab }">
-              <Spinner v-if="isLoading" class="py-20" :color="'gray-500'" :size="100" />
-              <Table v-if="!isLoading" :headers="['Start', 'End']" :data="schedules" @row-selected="handleRowClick" />
-            </template>
-          </Tab>
+           <!-- Spinner while loading -->
+           <div v-if="isLoading" class="py-20">
+              <Spinner :color="'gray-500'" :size="100" />
+            </div>
+          <Table  v-if="!isLoading" :headers="['Course ID', 'Name']" :data="courses"
+            @row-selected="handleRowClick" />
         </div>
       </div>
     </div>
@@ -121,45 +108,34 @@
 import Table from '@/components/UI/Table.vue';
 import Modal from '@/components/UI/Modal.vue';
 import Spinner from '@/components/UI/Spinner.vue';
-import Tab from '@/components/UI/Tab.vue';
 import axios from 'axios'
 
 export default {
   components: {
     Table,
     Modal,
-    Spinner,
-    Tab
+    Spinner
   },
   data() {
     return {
       modalOpen: false,
       searchTerm: '',
-      selectedSchedule: {},
-      schedules: [],
+      selectedCourse: {},
+      courses: [],
       file: null,
       isLoading: false,
       uploadLoading: false,
-      scheduleModalOpen: false,
-      createSchedule: false,
-      viewSchedule: true,
-      uploadedSchedules: [],
+      courseModalOpen: false,
+      createCourse: false,
+      viewCourse: true,
+      uploadedCourses: [],
       uploadedHeader: [],
-      uploadedSchedulesFinal: [],
-      tabs: [
-        { label: "Monday" },
-        { label: "Tuesday"},
-        { label: "Wednesday"},
-        { label: "Thursday"},
-        { label: "Friday"},
-        { label: "Saturday"},
-        { label: "Sunday"},
-      ],
+      uploadedCoursesFinal: []
     };
   },
   mounted() {
-    // Fetch schedules data on component mount
-    this.getSchedules();
+    // Fetch courses data on component mount
+    this.getCourses();
   },
   methods: {
     // Method to handle file selection
@@ -184,60 +160,59 @@ export default {
           const { data } = response;
           if (data.data.arraysWithNull.length > 0) {
             this.uploadedHeader = data.data.header;
-            this.uploadedSchedules = data.data.arraysWithNull;
-            this.uploadedSchedulesFinal = data.data.arrayWithoutNull;
+            this.uploadedCourses = data.data.arraysWithNull;
+            this.uploadedCoursesFinal = data.data.arrayWithoutNull;
           }
           this.uploadLoading = false;
 
         }).catch(error => console.error(error)).finally(() => {
-          this.uploadLoading = false;
-        });
+        this.uploadLoading = false;
+      });
     },
     // Method for saving the data from the uploaded file
     saveData() {
       this.uploadLoading = true;
       const formData = new FormData();
-      formData.append('schedules', JSON.stringify(this.uploadedSchedulesFinal));
-      axios.post('http://127.0.0.1:8000/api/schedule', formData)
+      formData.append('courses', JSON.stringify(this.uploadedCoursesFinal));
+      axios.post('http://127.0.0.1:8000/api/course', formData)
         .then(response => {
         }).catch(error => console.error(error)).finally(() => {
-          this.uploadLoading = false;
-        });
+        this.uploadLoading = false;
+      });
     },
-    updateSchedule() {
+    updateCourse(){
       this.isLoading = true;
-      axios.put('http://127.0.0.1:8000/api/schedules/id', { ...this.selectedSchedule })
+      axios.put('http://127.0.0.1:8000/api/courses/id', {...this.selectedCourse})
         .then(response => {
         }).catch(error => console.error(error)).finally(() => {
-          this.isLoading = false;
-        });
+        this.isLoading = false;
+      });
     },
-    createSchedule() {
+    createCourse(){
       this.isLoading = true;
-      axios.post('http://127.0.0.1:8000/api/schedules', { ...this.selectedSchedule })
+      axios.post('http://127.0.0.1:8000/api/courses', {...this.selectedCourse})
         .then(response => {
         }).catch(error => console.error(error)).finally(() => {
-          this.isLoading = false;
-        });
+        this.isLoading = false;
+      });
     },
-    // Method to fetch schedules data
-    getSchedules() {
+    // Method to fetch courses data
+    getCourses() {
       this.isLoading = true;
-      axios.get('http://127.0.0.1:8000/api/schedule/id', {
+      axios.get('http://127.0.0.1:8000/api/courses', {
         params: {
           search: this.searchTerm
         }
       }).then(response => {
-        this.schedules = response.data.data;
-        console.log(response.data.data)
+        this.courses = response.data.data;
       }).catch(error => console.error(error)).finally(() => {
         this.isLoading = false;
       });
     },
     // Method to handle row click event
     handleRowClick(row) {
-      this.scheduleModalOpen = true;
-      this.selectedSchedule = row;
+      this.courseModalOpen = true;
+      this.selectedCourse = row;
       console.log('Clicked row:', row);
       // Handle row click event
     },
@@ -248,18 +223,18 @@ export default {
     // Method to close modal
     closeModal() {
       this.modalOpen = false;
-      this.scheduleModalOpen = false;
+      this.courseModalOpen = false;
     },
     // Method to clear search term
     clear() {
       this.searchTerm = '';
-      this.getSchedules();
+      this.getCourses();
     },
-    createScheduleModal() {
-      this.selectedSchedule = {};
-      this.scheduleModalOpen = true;
-      this.createSchedule = true;
-      this.viewSchedule = false;
+    createCourseModal(){
+      this.selectedCourse = {};
+      this.courseModalOpen = true;
+      this.createCourse = true;
+      this.viewCourse = false;
 
     }
 
